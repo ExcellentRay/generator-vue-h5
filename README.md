@@ -1,6 +1,9 @@
 # vue模板工具
 
-> vue模板工具
+> 该vue模板包含了pc端和h5端, vue + vuex + vue-router + webpack
+> pc端 使用了饿了么ui
+> h5端 使用了vux ui
+
 
 ## Build Setup
 
