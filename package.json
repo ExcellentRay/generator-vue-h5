@@ -1,6 +1,6 @@
 {
   "name": "generator-vue-h5",
-  "version": "3.4.6",
+  "version": "3.4.7",
   "description": "基于vue的项目模板快速生成器，包含pc端和h5",
   "main": "index.js",
   "scripts": {
