@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>vuex-i18n</title>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.1/vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
+	<script src="https://unpkg.com/vuex@2.0.0"></script>
+
+	<script src="../dist/vuex-i18n.min.js"></script>
+
+	<style>
+
+		body {
+			font-family: Arial;
+			margin: 20px;
+		}
+
+		.example-text {
+			 margin-bottom: 40px;
+			 border:1px solid #efefef;
+			 padding: 20px;
+			 display: block;
+			 width: 600px;
+			 background-color: #eee
+		}
+
+		.block {
+			padding: 20px;
+			border: 1px solid lightgrey;
+			display: block;
+			min-width: 600px;
+			width: 600px;
+		}
+
+		h2 {
+			min-width: 600px;
+			width: 600px;
+			margin: 0;
+			margin-top: 20px;
+			padding: 10px 20px;
+			background-color: darkred;
+			color: white;
+			font-size: 16px;
+			font-weight: 400;
+		}
+
+		input[type=text], button {
+			padding: 5px 10px;
+			font-size: 16px;
+		}
+
+	</style>
+
+</head>
+<body>
+
+	<div id="app">
+
+		<h1>
+			Testing page
+		</h1>
+
+		<div class="example-text">
+			<h1>message.title: {{ $t('message.title') }}</h1>
+			<p>message.body: {{ $t('message.body') }}</p>
+			<p>custom.option1: {{ $t('custom.option1')}}</p>
+
+			<p><small>Footer: {{ 'message.footer' | translate }}</small></p>
+		</div>
+
+		<h2>Set language and load translations</h2>
+		<div class="block">
+			<input type="text" v-model="language" placeholder="de or en">
+			<button type="submit" @click="changeLanguage">Set language</button>
+			<p>Current Language: {{ $i18n.locale() }}</p>
+		</div>
+
+		<template v-if="$i18n.locale() == 'en'">
+		<h2>Update english locale translations</h2>
+			<div class="block">
+				<button type="submit" @click="updateEnLocale">Update the translations</button>
+				<p>Current Language: {{ $i18n.locale() }}</p>
+			</div>
+		</template>
+
+		<h2 v-if="!$i18n.exists('de')">Show fallback language translation</h2>
+		<div v-if="!$i18n.exists('de')" class="block">
+			no german translation available
+			<p>The fallback translation is: {{ $t('message.title') }}</p>
+		</div>
+
+		<h2>Translation for specific language</h2>
+		<div class="block">
+			<p>The english translation is: {{ $tlang('en', 'message.title') }}</p>
+		</div>
+
+		<h2>Render list with translations and options</h2>
+		<div class="block">
+			<ul>
+				<li v-for="block in $t('listing', {first:'1', second:'2'})">{{ block }}</li>
+			</ul>
+		</div>
+
+		<h2>Render translation with pluralization</h2>
+		<div class="block">
+			Number of Blocks: <input type="text" v-model="count">
+			<p>
+				{{ $t('plural', {count: count}, count) }}
+			</p>
+		</div>
+
+		<h2>Test if a key exists</h2>
+		<div class="block">
+			<strong>Show custom text if the key 'weird.translation' does not exist:</strong>
+			<p v-if="$i18n.keyExists('weird.translation')">
+				{{ $t('weird.translation') }}
+			</p>
+			<p v-else>
+				There is no translation for the key 'weird.translation'
+			</p>
+		</div>
+
+
+	</div>
+
+	<!-- application code -->
+	<script type="text/javascript">
+
+		// enable the vue devtools
+		Vue.config.devtools = true;
+
+		// initialize a new vuex store including our i18nVuexModule
+		const store = new Vuex.Store();
+
+		// initialize the vuexi18nPlugin
+		Vue.use(vuexI18n.plugin, store);
+
+		// define default translations for english text
+		const localeEn = {
+			'message.title': 'An Awesome Title',
+			'message.body': 'And some slightly less awesome text',
+			'message.footer': 'This is a footer text',
+			'weird.translation': 'This is a weird translation',
+			'listing': [
+				'this is block no. {first}',
+				'this is block no. {second}'
+			],
+			'custom': {
+				'option1': 'test',
+				'option2': 'test2'
+			},
+			'plural': 'We have one block ::: We have {count} blocks'
+		};
+
+		// updated locale information
+		// to simulate loading of new local translations via ajax
+		const localeEnPlus = {
+			'message.title': 'An Awesome Title 2',
+			'message.body': 'And some slightly less awesome text 2',
+			'message.footer': 'This is a footer text 2',
+			'listing': [
+				'this is block no. {first}',
+				'this is block no. {second}'
+			],
+			'plural': 'We have one block ::: We have {count} blocks'
+		};
+
+		// add the english locale to the i18n store
+		Vue.i18n.add('en', localeEn);
+
+		// set the current language to english
+		Vue.i18n.set('en');
+
+		Vue.i18n.fallback('en');
+
+		// use the plugin methods to access and add translations
+		var app = new Vue({
+			store,
+			el: '#app',
+			data: {
+				language: 'de',
+				count: 2
+			},
+			methods: {
+
+				// enable language changing
+				changeLanguage() {
+
+					let locale = this.language;
+					let url = `/test/locale-${locale}.json`;
+
+					// check if the locale has already been loaded
+					if (this.$i18n.exists(locale)) {
+						this.$i18n.set(locale);
+						return;
+					}
+
+					// load the specified locale from the server
+					this.$http.get(url).then((response) => {
+						return response.json();
+
+					}).then((data) => {
+						this.$i18n.add(locale, data);
+						this.$i18n.set(locale);
+
+					}).catch((error) => {
+						alert('could not fetch locale translations');
+					});
+
+				},
+
+				updateEnLocale() {
+
+					this.$i18n.add('en', localeEnPlus);
+
+				}
+			}
+		});
+
+
+	</script>
+
+</body>
+</html>

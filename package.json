@@ -1,0 +1,27 @@
+{
+  "name": "generator-vue-h5",
+  "version": "3.4.4",
+  "description": "基于vue的项目模板快速生成器，包含pc端和h5",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zhangfengrui/vue-h5"
+  },
+  "keywords": [
+    "generator-vue-h5"
+  ],
+  "author": "zhangfr",
+  "license": "MIT",
+  "dependencies": {
+    "del": "^2.2.0",
+    "chai": "^3.3.0",
+    "chalk": "^1.1.1",
+    "fs-extra": "^0.24.0",
+    "mocha": "^2.3.3",
+    "yeoman-generator": "^0.24.1",
+    "yosay": "^1.0.5"
+  }
+}
