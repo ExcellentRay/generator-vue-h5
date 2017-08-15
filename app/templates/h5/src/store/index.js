@@ -1,12 +1,14 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import demo from './modules/demo';  // demo
+import manager from './modules/manager';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     modules: {
-      demo: demo
+      demo: demo,
+      manager
     },
 
 });

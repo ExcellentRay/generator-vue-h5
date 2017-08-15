@@ -1,12 +1,22 @@
 <template>
   <div>
-    <router-view></router-view>
+    <transition :name="'vux-pop-' + (direction === 'forward' ? 'in' : 'out')">
+      <keep-alive>
+        <router-view class="router-view"></router-view>
+      </keep-alive>
+    </transition>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 
 export default {
+  computed:{
+    ...mapState({
+      direction: state => state.manager.direction
+    })
+  },
   beforeCreate() {
     //设置rem单位的值
     let width = window.screen.availWidth;
